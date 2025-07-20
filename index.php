@@ -64,8 +64,8 @@ function calculateStats($mealData) {
     $intervals = [];
     $durations = [];
     
-    // 最新30件を対象
-    $recentData = array_slice($mealData, 0, 30);
+    // 渡されたデータをそのまま使用
+    $recentData = $mealData;
     
     for ($i = 0; $i < count($recentData); $i++) {
         $current = $recentData[$i];
@@ -117,9 +117,30 @@ function formatTime($seconds) {
     return sprintf('%02d:%02d:%02d', $hours, $minutes, $secs);
 }
 
+// 直近N日分のデータを抽出する関数
+function filterMealDataByDays($mealData, $days = 30) {
+    $filtered = [];
+    $now = new DateTime();
+    foreach ($mealData as $meal) {
+        $start = new DateTime($meal['start_time']);
+        $interval = $now->diff($start)->days;
+        if ($interval < $days) {
+            $filtered[] = $meal;
+        } else {
+            break; // データは新しい順なので、daysを超えたら終了
+        }
+    }
+    return $filtered;
+}
+
 // 食事データを取得
 $mealData = readMealData($csvPath);
-$stats = calculateStats($mealData);
+// 直近30件のデータ
+$mealData30items = array_slice($mealData, 0, 30);
+$stats = calculateStats($mealData30items);
+// 直近30日分のデータ
+$mealData30days = filterMealDataByDays($mealData, 30);
+$stats30days = calculateStats($mealData30days);
 
 // デバッグ情報
 $debug_info = [
@@ -128,8 +149,12 @@ $debug_info = [
     'csv_path' => $csvPath,
     'csv_content' => file_exists($csvPath) ? file_get_contents($csvPath) : 'N/A',
     'meal_data_count' => is_array($mealData) ? count($mealData) : 0,
+    'meal_data_30days_count' => is_array($mealData30days) ? count($mealData30days) : 0,
+    'meal_data_30items_count' => is_array($mealData30items) ? count($mealData30items) : 0,
     'meal_data' => $mealData
 ];
+
+//echo $debug_info['meal_data_30days_count'];
 
 // POSTリクエストの処理
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -328,10 +353,10 @@ error_log("Meal Data: " . print_r($mealData, true));
         }
 
         h2 {
-          font-size: 1.3em;
-          font-weight: 400;
-          color: #54717e;
-          padding: 0px 5px;
+            font-size: 1.3em;
+            font-weight: 400;
+            color: #54717e;
+            padding: 0px 5px;
         }
         
         .btn {
@@ -382,7 +407,7 @@ error_log("Meal Data: " . print_r($mealData, true));
 
         /* 時間表示の色定義 */
         .insufficient {
-          color: #888888;
+            color: #888888;
         }
 
         .short {
@@ -399,7 +424,7 @@ error_log("Meal Data: " . print_r($mealData, true));
 
         /* 日付表示の色定義 */
         .date-color-1 {
-           color: #863A14;
+            color: #863A14;
         }
 
         .date-color-2 {
@@ -484,18 +509,18 @@ error_log("Meal Data: " . print_r($mealData, true));
         }
 
         .stat-card .item-name {
-          width: 200px;
+            width: 200px;
         }
 
         .stat-card .stat-methods {
-          width: 140px;
+            width: 140px;
         
         }
 
         .stat-card .stat-value {
-          width: 90%;
-          font-size: 1.5em;
-          padding-top: 4px;
+            width: 90%;
+            font-size: 1.5em;
+            padding-top: 4px;
         }
                         
         .stat-card h3 {
@@ -665,7 +690,7 @@ error_log("Meal Data: " . print_r($mealData, true));
         <div class="tab-content">
             <!-- 履歴タブ -->
             <div id="list" class="tab-pane">
-                <h2><i class="fas fa-history"></i> 食事履歴（直近30件）</h2>
+                <h2><i class="fas fa-history"></i> 食事履歴（直近30日）</h2>
                 <table class="meal-table">
                     <thead>
                         <tr>
@@ -676,17 +701,14 @@ error_log("Meal Data: " . print_r($mealData, true));
                     </thead>
                     <tbody>
                         <?php
-                        // 表示用に30件、間隔計算用に31件取得
-                        $displayData = array_slice($mealData, 0, 30);
-                        $intervalData = array_slice($mealData, 0, 31);
-                        
+                        // 直近30日分のデータで表示（間隔計算用に1つ余分に取得）
+                        $displayData = $mealData30days;
+                        $intervalData = array_slice($mealData, 0, count($mealData30days) + 1);
                         $currentDate = null;
                         $dateColorIndex = 0;
-                        
                         for ($i = 0; $i < count($displayData); $i++) {
                             $meal = $displayData[$i];
                             $startTime = new DateTime($meal['start_time']);
-                            
                             // 日付の色分け
                             $mealDate = $startTime->format('Y-m-d');
                             if ($currentDate !== $mealDate) {
@@ -694,7 +716,6 @@ error_log("Meal Data: " . print_r($mealData, true));
                                 $dateColorIndex = ($dateColorIndex + 1) % 4;
                             }
                             $dateColorClass = 'date-color-' . ($dateColorIndex + 1);
-                            
                             // 食事時間の計算と色分け
                             $duration = '';
                             $durationClass = '';
@@ -702,8 +723,6 @@ error_log("Meal Data: " . print_r($mealData, true));
                                 $endTime = new DateTime($meal['end_time']);
                                 $diff = $endTime->getTimestamp() - $startTime->getTimestamp();
                                 $duration = formatTime($diff);
-                                
-                                // 食事時間の色分け（15分未満、～30分、～60分、60分以上）
                                 if ($diff < 15 * 60) {
                                     $durationClass = 'insufficient';
                                 } else if ($diff < 30 * 60) {
@@ -716,7 +735,6 @@ error_log("Meal Data: " . print_r($mealData, true));
                             } else {
                                 $duration = '--:--:--';
                             }
-                            
                             // 前回からの間隔と色分け
                             $interval = '';
                             $intervalClass = '';
@@ -725,8 +743,6 @@ error_log("Meal Data: " . print_r($mealData, true));
                                 $prevStart = new DateTime($prevMeal['start_time']);
                                 $intervalSeconds = $startTime->getTimestamp() - $prevStart->getTimestamp();
                                 $interval = formatTime($intervalSeconds);
-                                
-                                // 間隔の色分け（5時間未満、－、～16時間、16時間以上）
                                 if ($intervalSeconds < 5 * 60 * 60) {
                                     $intervalClass = 'insufficient';
                                 } else if ($intervalSeconds < 16 * 60 * 60) {
@@ -739,7 +755,6 @@ error_log("Meal Data: " . print_r($mealData, true));
                             } else {
                                 $interval = '初回';
                             }
-                            
                             echo "<tr>";
                             echo "<td class='{$dateColorClass}'>" . $startTime->format('m/d H:i:s') . "</td>";
                             echo "<td class='{$durationClass}'>" . $duration . "</td>";
@@ -814,6 +829,29 @@ error_log("Meal Data: " . print_r($mealData, true));
                         <div class="item-name"><i class="fas fa-hourglass-half"></i> 食事時間</div>
                         <div class="stat-methods">中央値</div>
                         <div class="stat-value"><?php echo formatTime($stats['duration_median']); ?></div>
+                    </div>
+                </div>
+                <h2 style="margin-top:30px;"><i class="fas fa-chart-line"></i> 食事統計（直近30日）</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="item-name"><i class="fas fa-clock"></i> 食事間隔</div>
+                        <div class="stat-methods">平均</div>
+                        <div class="stat-value"><?php echo formatTime($stats30days['interval_avg']); ?></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="item-name"><i class="fas fa-clock"></i> 食事間隔</div>
+                        <div class="stat-methods">中央値</div>
+                        <div class="stat-value"><?php echo formatTime($stats30days['interval_median']); ?></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="item-name"><i class="fas fa-hourglass-half"></i> 食事時間</div>
+                        <div class="stat-methods">平均</div>
+                        <div class="stat-value"><?php echo formatTime($stats30days['duration_avg']); ?></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="item-name"><i class="fas fa-hourglass-half"></i> 食事時間</div>
+                        <div class="stat-methods">中央値</div>
+                        <div class="stat-value"><?php echo formatTime($stats30days['duration_median']); ?></div>
                     </div>
                 </div>
             </div>
