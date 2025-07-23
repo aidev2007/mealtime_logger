@@ -459,6 +459,8 @@ error_log("Meal Data: " . print_r($mealData, true));
 
         .meal-start-time,
         .meal-end-time {
+            font-family: monospace;
+            font-size: large;
             margin: 5px 0;
             color: #666;
         }
