@@ -17,6 +17,62 @@ if (!file_exists(HTACCESS_FILE)) {
 
 $csvPath = LOG_FILE;
 
+// パスワードファイルがなければ初回セットアップ画面
+if (!file_exists(PASSWORD_FILE)) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['setup_password'])) {
+        $pw = trim($_POST['setup_password']);
+        if ($pw !== '') {
+            file_put_contents(PASSWORD_FILE, $pw . "\n");
+            header('Location: ' . $_SERVER['REQUEST_URI']);
+            exit;
+        } else {
+            $setup_error = 'パスワードを入力してください。';
+        }
+    }
+    ?>
+    <!DOCTYPE html>
+    <html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>パスワード初期設定</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <?php echo get_common_css(); ?>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1><i class="fas fa-utensils"></i> 食事時間ログ</h1>
+            </div>
+            <div class="card setup-card">
+                <h2>パスワード初期設定</h2>
+                <?php if (!empty($setup_error)) echo '<div class="alert alert-danger">' . htmlspecialchars($setup_error) . '</div>'; ?>
+                <form method="post" action="">
+                    <div class="form-group">
+                        <p class="setup_message">
+                            この画面は初回起動時のみ表示されます。<br>
+                            <b>パスワード</b>を設定してください。<br>
+                            ここで設定したパスワードを知っている方のみ、ロックを解除して書き込みが行えるようになります。<br><br>
+                            <b>ファイル構成とその説明:</b><br>
+                            <code>mealtime_data/</code><br>
+                            ├ <code>.password</code> &nbsp;ここで設定したパスワードが保存されます。<br>
+                            ├ <code>log.csv</code> &nbsp;食事記録データが保存されます。<br>
+                            └ <code>.htaccess</code> &nbsp;mealtime_dataディレクトリ内をWebから閲覧できないようにします。
+                        </p>
+                        <p class="addtion">※これらのファイルは自動生成されます。通常は手動で編集・削除する必要はありません。初期化するにはディレクトリごと削除してください。</p>
+                        <label for="setup_password">パスワード</label>
+                        <input type="password" id="setup_password" name="setup_password" placeholder="設定するパスワードを入力" class="form-control setup-input" required>
+                    </div>
+                    <button type="submit" class="btn setup-btn">設定</button>
+                </form>
+            </div>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
+}
+
 // CSVファイルが存在しない場合は作成（ヘッダー付き）
 if (!file_exists($csvPath)) {
     $result = file_put_contents($csvPath, "start_time,end_time\n");
@@ -1091,6 +1147,37 @@ function get_common_css() {
           color: #ccc; /* 薄いグレーにする例 */
         }
 
+        /* パスワード初期設定画面専用 */
+        .setup-btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .setup-input {
+            width: 100%;
+        }
+        .setup_message {
+            color:#444444;
+            margin-bottom: 10px;
+        }
+
+        .addtion {
+            color: #888899;
+            margin-left: 1em;
+            text-indent: -1em;
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
 
         @media (max-width: 768px) {
             .container {
@@ -1124,6 +1211,24 @@ function get_common_css() {
                 flex: 0 1 100%;
             }
         }
-</style>
+
+        .setup-card {
+            padding: 20px;
+        }
+
+        .setup-card h2 {
+            margin: 10px 0px;
+            padding: 0px;
+        }
+        #setup_password {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            margin-bottom:20px;
+        }
+
+
+    </style>
 CSS;
 }
