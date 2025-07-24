@@ -39,26 +39,6 @@ function readMealData($csvPath) {
     return array_reverse($data); // 新しいもの順
 }
 
-// === バックアップ関数追加 ===
-function backupCsv($csvPath) {
-    $bak1 = $csvPath . '.bak1';
-    $bak2 = $csvPath . '.bak2';
-    $bak3 = $csvPath . '.bak3';
-    // 古いバックアップを順にローテーション
-    if (file_exists($bak3)) {
-        unlink($bak3);
-    }
-    if (file_exists($bak2)) {
-        rename($bak2, $bak3);
-    }
-    if (file_exists($bak1)) {
-        rename($bak1, $bak2);
-    }
-    if (file_exists($csvPath)) {
-        copy($csvPath, $bak1);
-    }
-}
-
 // 統計計算
 function calculateStats($mealData) {
     $intervals = [];
@@ -183,8 +163,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $startTime = date('Y-m-d\TH:i:s');
         
-        // === バックアップ作成 ===
-        backupCsv($csvPath);
         // CSVに新しい行を追加（開始時間のみ）
         $fp = fopen($csvPath, 'a');
         fputcsv($fp, [$startTime, '']);
@@ -197,8 +175,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'end_meal') {
         $endTime = date('Y-m-d\TH:i:s');
         
-        // === バックアップ作成 ===
-        backupCsv($csvPath);
         // CSVの最後の行を更新（終了時間を追加または上書き）
         $lines = file($csvPath);
         if (count($lines) > 1) {
@@ -221,8 +197,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // === バックアップ作成 ===
-        backupCsv($csvPath);
         $lines = file($csvPath);
         if (count($lines) > 1) {
             $lastLine = trim($lines[count($lines) - 1]);
