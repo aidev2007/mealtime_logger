@@ -1,14 +1,21 @@
 <?php
 session_start();
 
-// === 設置者向け: パスワード設定 ===
-// 下記の定数を任意のパスワードに変更してください。
-const MEALTIME_PASSWORD = 'your-password';
 // ==============================
+// === データディレクトリ・ファイルの初期化、.htaccess自動生成 ===
+define('DATA_DIR', __DIR__ . '/mealtime_data');
+define('PASSWORD_FILE', DATA_DIR . '/.password');
+define('LOG_FILE', DATA_DIR . '/log.csv');
+define('HTACCESS_FILE', DATA_DIR . '/.htaccess');
 
-// CSVファイルのパスを設定
-$csvPath = 'mealtime_log.csv';
+if (!is_dir(DATA_DIR)) {
+    mkdir(DATA_DIR, 0755, true);
+}
+if (!file_exists(HTACCESS_FILE)) {
+    file_put_contents(HTACCESS_FILE, "Deny from all\n");
+}
 
+$csvPath = LOG_FILE;
 
 // CSVファイルが存在しない場合は作成（ヘッダー付き）
 if (!file_exists($csvPath)) {
@@ -140,9 +147,14 @@ $debug_info = [
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     
+    $PASSWORD = '';
+    if (file_exists(PASSWORD_FILE)) {
+        $PASSWORD = trim(file_get_contents(PASSWORD_FILE));
+    }
+
     if ($action === 'authenticate') {
         $password = $_POST['password'] ?? '';
-        if ($password === MEALTIME_PASSWORD) {
+        if ($password === $PASSWORD) {
             echo json_encode(['status' => 'success']);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'パスワードが正しくありません']);
