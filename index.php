@@ -233,9 +233,6 @@ error_log("Meal Data: " . print_r($mealData, true));
     <title>食事時間ログ</title>
     <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍛</text></svg>'>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Debug Info:
-    <?php echo json_encode($debug_info, JSON_PRETTY_PRINT); ?>
-    -->
     <?php echo get_common_css(); ?>
 </head>
 <body>
