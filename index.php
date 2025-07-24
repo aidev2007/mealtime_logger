@@ -236,408 +236,7 @@ error_log("Meal Data: " . print_r($mealData, true));
     <!-- Debug Info:
     <?php echo json_encode($debug_info, JSON_PRETTY_PRINT); ?>
     -->
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #ffd89a 0%, #fad0c4 100%);
-            min-height: 100vh;
-            padding: 10px 10px;
-        }
-
-        .container {
-            margin: 10px;
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            /*margin-bottom: 10px;*/
-            padding: 5px;
-            border-radius: 15px;
-            /*background-color: #26cffe;*/
-            background-color: rgba(192,192,192,0.25);
-        }
-
-        .tabs {
-            display: flex;
-            /*background: #f8f9fa;*/
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            /*border-bottom: 1px solid #dee2e6;*/
-        }
-
-        .tab {
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            background: #f8f9fa;
-            border: none;
-            font-size: 1.1em;
-            transition: all 0.3s ease;
-            color: #6c757d;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            border-right: 1px solid #cccccc;
-            /*border: 1px solid red;*/
-        }
-
-        .tab.active {
-            background: white;
-            color: #495057;
-            /*border-bottom: 3px solid #007bff;*/
-            border-bottom: 3px solid #ffffff;
-            border-left: 1px solid #ffffff;
-        }
-
-        .tab:hover {
-            /*background: #e9ecef;*/
-            background: #ffffff;
-        }
-
-        .tab-content {
-            padding: 30px;
-            /*min-height: 400px;*/
-        }
-
-        .tab-pane {
-            display: none;
-        }
-
-        .tab-pane.active {
-            display: block;
-        }
-
-        h2 {
-            font-size: 1.3em;
-            font-weight: 400;
-            color: #54717e;
-            padding: 0px 5px;
-        }
-        
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 25px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            margin: 0px 5px;
-            min-width: 140px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        input#password {
-            margin-bottom: 20px;
-        }
-
-/*
-        .time-display {
-            font-size: 2.5em;
-            text-align: center;
-            margin: 30px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            font-weight: bold;
-        }
-*/
-
-        /* 時間表示の色定義 */
-        .insufficient {
-            color: #888888;
-        }
-
-        .short {
-            color: #33C888;
-        }
-
-        .medium {
-            color: #EF963C;
-        }
-
-        .long {
-            color: #dc3545;
-        }
-
-        /* 日付表示の色定義 */
-        .date-color-1 {
-            color: #863A14;
-        }
-
-        .date-color-2 {
-            color: #278614;
-        }
-
-        .date-color-3 {
-            color: #146086;
-        }
-
-        .date-color-4 {
-            color: #731486;
-        }
-
-/*
-        .time-display.insufficient {
-            color: #28a745;
-        }
-
-        .time-display.short {
-            color: #00FFFF;
-        }
-
-        .time-display.medium {
-            color: #ffc107;
-        }
-
-        .time-display.long {
-            color: #dc3545;
-        }
-*/
-
-        .meal-start-time,
-        .meal-end-time {
-            font-family: monospace;
-            font-size: large;
-            margin: 5px 0;
-            color: #666;
-        }
-
-        .meal-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            position: relative;
-        }
-
-        .meal-table th,
-        .meal-table td {
-            padding: 5px;
-            text-align: center;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .meal-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #495057;
-        }
-
-        .meal-table tr:hover {
-            background: #f8f9fa;
-        }
-        
-        .stats-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 20px;
-            justify-content: center;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #ffd89a11 0%, #fad0c466 100%);
-            color: #3c8da7;
-            padding: 15px 15px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            min-width: 250px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .stat-card .item-name {
-            width: 200px;
-        }
-
-        .stat-card .stat-methods {
-            width: 140px;
-        
-        }
-
-        .stat-card .stat-value {
-            width: 90%;
-            font-size: 1.5em;
-            padding-top: 4px;
-        }
-                        
-        .stat-card h3 {
-            margin-bottom: 10px;
-            font-size: 1.1em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .stat-value {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-card p {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        .input-section {
-            /*text-align: center;*/
-        }
-
-        .status-info {
-            background: #e3f2fd;
-            border: 1px solid #bbdefb;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            color: #1976d2;
-            text-align: center;
-        }
-
-        .status-info.meal-in-progress {
-            background: #FFEDDF;
-            border-color: #FFD0AC;
-        }
-
-        .status-info .insufficient {
-            color: #888888;
-        }
-
-        .status-info .short {
-            color: #28a745;
-        }
-
-        .status-info .medium {
-            color: #ffc107;
-        }
-
-        .status-info .long {
-            color: #dc3545;
-        }
-
-        #elapsed-time {
-            font-size: 2.5em;
-            /*text-align: center;*/
-            /*margin: 30px 0;*/
-            /*padding: 20px;*/
-            /*background: #f8f9fa;*/
-            /*border-radius: 10px;*/
-            font-weight: bold;
-        }
-
-        #meal-controls {
-            text-align: center;
-        }
-
-        #auth-controls {
-            text-align: center;
-        }
-
-        .password-input {
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .password-input input {
-            padding: 8px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
-            /*margin: 10px 0;*/
-        }
-
-        .auth-message {
-            margin: 20px 0;
-            color: #666;
-        }
-
-        .error-message {
-            color: #dc3545;
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        .undo-button {
-            display: none; /* 古いスタイルを非表示に */
-        }
-
-        input::placeholder {
-          color: #ccc; /* 薄いグレーにする例 */
-        }
-
-
-        @media (max-width: 768px) {
-            .container {
-                border-radius: 10px;
-            }
-
-            .header {
-                padding: 15px;
-            }
-
-            .header h1 {
-                font-size: 2em;
-            }
-
-            .tab-content {
-                padding: 10px;
-                padding-bottom: 30px;
-            }
-
-/*
-            .time-display {
-                font-size: 2em;
-            }
-*/
-
-            .meal-table {
-                font-size: 0.9em;
-            }
-
-            .stat-card {
-                flex: 0 1 100%;
-            }
-        }
-    </style>
+    <?php echo get_common_css(); ?>
 </head>
 <body>
     <div class="container">
@@ -1109,3 +708,413 @@ error_log("Meal Data: " . print_r($mealData, true));
     </script>
 </body>
 </html>
+
+<?php
+
+// 共通CSS
+function get_common_css() {
+    return <<<CSS
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffd89a 0%, #fad0c4 100%);
+            min-height: 100vh;
+            padding: 10px 10px;
+        }
+
+        .container {
+            margin: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            /*margin-bottom: 10px;*/
+            padding: 5px;
+            border-radius: 15px;
+            /*background-color: #26cffe;*/
+            background-color: rgba(192,192,192,0.25);
+        }
+
+        .tabs {
+            display: flex;
+            /*background: #f8f9fa;*/
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            /*border-bottom: 1px solid #dee2e6;*/
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            color: #6c757d;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            border-right: 1px solid #cccccc;
+            /*border: 1px solid red;*/
+        }
+
+        .tab.active {
+            background: white;
+            color: #495057;
+            /*border-bottom: 3px solid #007bff;*/
+            border-bottom: 3px solid #ffffff;
+            border-left: 1px solid #ffffff;
+        }
+
+        .tab:hover {
+            /*background: #e9ecef;*/
+            background: #ffffff;
+        }
+
+        .tab-content {
+            padding: 30px;
+            /*min-height: 400px;*/
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.3em;
+            font-weight: 400;
+            color: #54717e;
+            padding: 0px 5px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin: 0px 5px;
+            min-width: 140px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        input#password {
+            margin-bottom: 20px;
+        }
+
+/*
+        .time-display {
+            font-size: 2.5em;
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+*/
+
+        /* 時間表示の色定義 */
+        .insufficient {
+            color: #888888;
+        }
+
+        .short {
+            color: #33C888;
+        }
+
+        .medium {
+            color: #EF963C;
+        }
+
+        .long {
+            color: #dc3545;
+        }
+
+        /* 日付表示の色定義 */
+        .date-color-1 {
+            color: #863A14;
+        }
+
+        .date-color-2 {
+            color: #278614;
+        }
+
+        .date-color-3 {
+            color: #146086;
+        }
+
+        .date-color-4 {
+            color: #731486;
+        }
+
+/*
+        .time-display.insufficient {
+            color: #28a745;
+        }
+
+        .time-display.short {
+            color: #00FFFF;
+        }
+
+        .time-display.medium {
+            color: #ffc107;
+        }
+
+        .time-display.long {
+            color: #dc3545;
+        }
+*/
+
+        .meal-start-time,
+        .meal-end-time {
+            font-family: monospace;
+            font-size: large;
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .meal-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .meal-table th,
+        .meal-table td {
+            padding: 5px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .meal-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .meal-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .stats-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffd89a11 0%, #fad0c466 100%);
+            color: #3c8da7;
+            padding: 15px 15px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            min-width: 250px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .stat-card .item-name {
+            width: 200px;
+        }
+
+        .stat-card .stat-methods {
+            width: 140px;
+        
+        }
+
+        .stat-card .stat-value {
+            width: 90%;
+            font-size: 1.5em;
+            padding-top: 4px;
+        }
+                        
+        .stat-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .input-section {
+            /*text-align: center;*/
+        }
+
+        .status-info {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #1976d2;
+            text-align: center;
+        }
+
+        .status-info.meal-in-progress {
+            background: #FFEDDF;
+            border-color: #FFD0AC;
+        }
+
+        .status-info .insufficient {
+            color: #888888;
+        }
+
+        .status-info .short {
+            color: #28a745;
+        }
+
+        .status-info .medium {
+            color: #ffc107;
+        }
+
+        .status-info .long {
+            color: #dc3545;
+        }
+
+        #elapsed-time {
+            font-size: 2.5em;
+            /*text-align: center;*/
+            /*margin: 30px 0;*/
+            /*padding: 20px;*/
+            /*background: #f8f9fa;*/
+            /*border-radius: 10px;*/
+            font-weight: bold;
+        }
+
+        #meal-controls {
+            text-align: center;
+        }
+
+        #auth-controls {
+            text-align: center;
+        }
+
+        .password-input {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .password-input input {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            /*margin: 10px 0;*/
+        }
+
+        .auth-message {
+            margin: 20px 0;
+            color: #666;
+        }
+
+        .error-message {
+            color: #dc3545;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .undo-button {
+            display: none; /* 古いスタイルを非表示に */
+        }
+
+        input::placeholder {
+          color: #ccc; /* 薄いグレーにする例 */
+        }
+
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 10px;
+            }
+
+            .header {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .tab-content {
+                padding: 10px;
+                padding-bottom: 30px;
+            }
+
+/*
+            .time-display {
+                font-size: 2em;
+            }
+*/
+
+            .meal-table {
+                font-size: 0.9em;
+            }
+
+            .stat-card {
+                flex: 0 1 100%;
+            }
+        }
+</style>
+CSS;
+}
