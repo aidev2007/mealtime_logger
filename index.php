@@ -594,11 +594,11 @@ error_log("Meal Data: " . print_r($mealData, true));
                 return;
             }
 
-            if (event.key === 'PageUp') {
+            if (event.key === 'ArrowLeft') {
                 event.preventDefault();
                 currentTabIndex = (currentTabIndex - 1 + tabOrder.length) % tabOrder.length;
                 showTab(tabOrder[currentTabIndex]);
-            } else if (event.key === 'PageDown') {
+            } else if (event.key === 'ArrowRight') {
                 event.preventDefault();
                 currentTabIndex = (currentTabIndex + 1) % tabOrder.length;
                 showTab(tabOrder[currentTabIndex]);
